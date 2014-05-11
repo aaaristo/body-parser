@@ -28,6 +28,31 @@ describe('bodyParser.urlencoded()', function(){
     .expect(200, '{"user":"tobi"}', done)
   })
 
+  it('should parse extended syntax', function(done){
+    request(server)
+    .post('/')
+    .set('Content-Type', 'application/x-www-form-urlencoded')
+    .send('user[name][first]=Tobi')
+    .expect(200, '{"user":{"name":{"first":"Tobi"}}}', done)
+  })
+
+  describe('with extended option', function(){
+    var server;
+    var options;
+    before(function(){
+      options = { extended: false }
+      server = createServer(options)
+    })
+
+    it('should not parse extneded syntax', function(done){
+      request(server)
+      .post('/')
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .send('user[name][first]=Tobi')
+      .expect(200, '{"user[name][first]":"Tobi"}', done)
+    })
+  })
+
   describe('with limit option', function(){
     var server;
     var options;

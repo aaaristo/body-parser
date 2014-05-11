@@ -64,8 +64,9 @@ The `reviver` argument is passed directly to `JSON.parse` as the second argument
 
 ### bodyParser.urlencoded(options)
 
-Returns middleware that only parses `urlencoded` with the [qs](https://github.com/visionmedia/node-querystring) module. The options are:
+Returns middleware that only parses `urlencoded` bodies. The options are:
 
+- `extended` - parse extended syntax with the [qs](https://github.com/visionmedia/node-querystring) module. (default: `true`)
 - `limit` - maximum request body size. (default: `<100kb>`)
 - `type` - request content-type to parse (default: `urlencoded`)
 - `verify` - function to verify body content

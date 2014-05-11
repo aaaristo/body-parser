@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * add `extended` option to urlencoded parser
+
 1.2.0 / 2014-05-11
 ==================
 
