@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * check accepted charset in content-type (accepts utf-8)
+
 1.2.0 / 2014-05-11
 ==================
 

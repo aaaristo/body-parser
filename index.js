@@ -5,7 +5,9 @@ var typeis = require('type-is');
 var http = require('http');
 var qs = require('qs');
 
+var charsetRegExp = /; * charset *= *("(?:[\u0000-\u0021\u0023-\u005b\u005d-\u007f]|\\[\u0000-\u007f])*"|[\u0000-\u007f]+)/
 var firstcharRegExp = /^\s*(.)/
+var slice = Array.prototype.slice
 
 exports = module.exports = bodyParser;
 exports.json = json;
@@ -70,8 +72,14 @@ function json(options){
 
     if (!typeis(req, type)) return next();
 
+    var charset = charsetis(req, 'utf-8')
+    if (charset === false) {
+      return next(error(415, 'unsupported charset'))
+    }
+
     // read
     read(req, res, next, parse, {
+      encoding: charset,
       limit: limit,
       verify: verify
     })
@@ -103,12 +111,50 @@ function urlencoded(options){
 
     if (!typeis(req, type)) return next();
 
+    var charset = charsetis(req, 'utf-8')
+    if (charset === false) {
+      return next(error(415, 'unsupported charset'))
+    }
+
     // read
     read(req, res, next, parse, {
+      encoding: charset,
       limit: limit,
       verify: verify
     })
   }
+}
+
+function charsetis(req, charsets) {
+  var type = req.headers['content-type']
+
+  if (!type) return false
+
+  charsets = !Array.isArray(charsets)
+    ? slice.call(arguments, 1)
+    : charsets
+
+  // get charset
+  var match = charsetRegExp.exec(type)
+  var charset = match
+    ? match[1].toLowerCase()
+    : undefined;
+
+  // no charsets, return the charset
+  if (!charsets || !charsets.length) return charset
+
+  // no charset, return undefined
+  if (!charset) return undefined
+
+  return ~charsets.indexOf(charset)
+    ? charset
+    : false;
+}
+
+function error(code, msg) {
+  var err = new Error(msg || http.STATUS_CODES[code]);
+  err.status = code;
+  return err;
 }
 
 function firstchar(str) {
